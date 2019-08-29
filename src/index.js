@@ -93,8 +93,6 @@ function assignRandomCategory(turn) {
 }
 
 function calculateCategoryValue(category, scoreBoard, lastRoll) {
-    console.log(JSON.stringify(lastRoll, null, 2));
-
     switch (category) {
         case Categories.upper.aces:
             scoreBoard.upper.aces.points = calculateUpperCategory(1, lastRoll);
@@ -182,7 +180,7 @@ function calculateFullHouse(roll) {
 }
 
 function calculateSmallStraight(roll) {
-    let sortedDices = roll.sort(sortDicesHandler);
+    let sortedDices = Object.values(roll).sort(sortDicesHandler);
     let uniqueDices = [...new Set(Object.values(sortedDices))];
     if (uniqueDices.length < 4) {
         return 0;
@@ -196,7 +194,7 @@ function calculateSmallStraight(roll) {
 }
 
 function calculateLargeStraight(roll) {
-    let sortedDices = roll.sort(sortDicesHandler);
+    let sortedDices = Object.values(roll).sort(sortDicesHandler);
     let uniqueDices = [...new Set(Object.values(sortedDices))];
     if (uniqueDices.length < 5) {
         return 0;
@@ -210,8 +208,8 @@ function calculateLargeStraight(roll) {
 }
 
 function calculateYahtzee(roll) {
-    let firstValue = roll[0];
-    for (const dice in rolls) {
+    let firstValue = roll[0].value;
+    for (const dice in roll) {
         if (firstValue !== dice.value) {
             return 0;
         }
@@ -231,7 +229,7 @@ function calculateNumberOfAKind(minCount, roll) {
 
 const sortDicesHandler = (diceA, diceB) => diceA.value - diceB.value;
 
-function countDices(rolls) {
+function countDices(roll) {
     let diceCount = {
         1: 0,
         2: 0,
@@ -240,7 +238,7 @@ function countDices(rolls) {
         5: 0,
         6: 0
     };
-    for (const dice in rolls) {
+    for (const dice in roll) {
         diceCount[dice.value]++;
     }
     return diceCount;
@@ -249,7 +247,7 @@ function countDices(rolls) {
 function calculateChance(lastRoll) {
     let sum = 0;
     for (const dice in lastRoll) {
-        sum = +dice.value;
+        sum += dice.value;
     }
     return sum;
 }
@@ -274,11 +272,13 @@ function findOpenCategories(categories) {
     return openCatergories;
 }
 
-function scoreBoardFull(scoreBoard) {
-    return !hasUnassignedValues(scoreBoard.upper) && !hasUnassignedValues(scoreBoard.lower);
+function scoreBoardFree(scoreBoard) {
+    return hasUnassignedValues(scoreBoard.upper) || hasUnassignedValues(scoreBoard.lower);
 }
 
 function hasUnassignedValues(categories) {
+    console.log(JSON.stringify(categories, null, 2));
+
     for (const category of Object.values(categories)) {
         if (!category.assigned) {
             return true;
@@ -333,7 +333,7 @@ function createRandomMatch(maxNumberPlayer) {
 }
 
 function createRandomTurn(lastTurn) {
-    if (!scoreBoardFull(lastTurn.scoreBoard)) {
+    if (scoreBoardFree(lastTurn.scoreBoard)) {
         const newTurn = {
             ...lastTurn,
             nr: lastTurn.nr + 1,
@@ -348,7 +348,20 @@ function createRandomTurn(lastTurn) {
         assignRandomCategory(newTurn);
         return newTurn;
     } else {
-        return undefined;
+        return false;
     }
 }
-console.log(JSON.stringify(createRandomMatch(1), null, 2));
+
+console.log(
+    JSON.stringify(
+        calculateFullHouse([
+            { ...InitialDice, value: 2 },
+            { ...InitialDice, value: 2 },
+            { ...InitialDice, value: 3 },
+            { ...InitialDice, value: 3 },
+            { ...InitialDice, value: 3 }
+        ]),
+        null,
+        2
+    )
+);
