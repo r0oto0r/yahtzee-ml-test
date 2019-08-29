@@ -27,128 +27,139 @@ const Categories = {
     bonus: 'bonus'
 };
 
-const InitialRoll = {
-    dice0: {
-        value: 0,
-        keep: false
-    },
-    dice1: {
-        value: 0,
-        keep: false
-    },
-    dice2: {
-        value: 0,
-        keep: false
-    },
-    dice3: {
-        value: 0,
-        keep: false
-    },
-    dice4: {
-        value: 0,
-        keep: false
-    }
+const InitialDice = {
+    value: 0,
+    keep: false
+};
+
+const InitialRoll = [
+    { ...InitialDice },
+    { ...InitialDice },
+    { ...InitialDice },
+    { ...InitialDice },
+    { ...InitialDice }
+];
+
+const InitialCategory = {
+    points: 0,
+    assigned: false
 };
 
 const InitialTurn = {
     nr: 0,
     scoreBoard: {
         upper: {
-            aces: undefined,
-            twos: undefined,
-            threes: undefined,
-            fours: undefined,
-            fives: undefined,
-            sixes: undefined
+            aces: { ...InitialCategory },
+            twos: { ...InitialCategory },
+            threes: { ...InitialCategory },
+            fours: { ...InitialCategory },
+            fives: { ...InitialCategory },
+            sixes: { ...InitialCategory }
         },
         lower: {
-            threeOfAKind: undefined,
-            fourOfAKind: undefined,
-            fullHouse: undefined,
-            smallStraight: undefined,
-            largeStraight: undefined,
-            yahtzee: undefined,
-            chance: undefined
+            threeOfAKind: { ...InitialCategory },
+            fourOfAKind: { ...InitialCategory },
+            fullHouse: { ...InitialCategory },
+            smallStraight: { ...InitialCategory },
+            largeStraight: { ...InitialCategory },
+            yahtzee: { ...InitialCategory },
+            chance: { ...InitialCategory }
         },
-        bonus: undefined
+        bonus: { ...InitialCategory }
     },
-    rolls: [],
+    rolls: [{ ...InitialRoll }],
     score: 0
 };
 
 const InitialPlayer = {
     pos: 0,
-    turns: []
+    turns: [{ ...InitialTurn }]
 };
 
 const InitialMatch = {
     id: 0,
-    players: [],
+    players: [{ ...InitialPlayer }],
     finished: true
 };
 
 function assignRandomCategory(turn) {
     const { scoreBoard, rolls } = turn;
-    let openCatergories = findOpenCategories({ ...scoreBoard.upper, ...scoreBoard.lower });
+    let openCatergories = [];
+    openCatergories = openCatergories.concat(findOpenCategories(scoreBoard.upper));
+    openCatergories = openCatergories.concat(findOpenCategories(scoreBoard.lower));
     let category = openCatergories[getRandomInt(openCatergories.length) - 2];
     let lastRoll = rolls[rolls.length - 1];
     let categoryValue = calculateCategoryValue(category, scoreBoard, lastRoll);
-    console.log(`${lastRoll} ${category} ${categoryValue}`);
 }
 
 function calculateCategoryValue(category, scoreBoard, lastRoll) {
+    console.log(JSON.stringify(lastRoll, null, 2));
+
     switch (category) {
         case Categories.upper.aces:
-            scoreBoard.upper.aces = calculateUpperCategory(1, lastRoll);
-            return scoreBoard.upper.aces;
+            scoreBoard.upper.aces.points = calculateUpperCategory(1, lastRoll);
+            scoreBoard.upper.aces.assigned = true;
+            return scoreBoard.upper.aces.points;
             break;
         case Categories.upper.twos:
-            scoreBoard.upper.twos = calculateUpperCategory(2, lastRoll);
-            return scoreBoard.upper.twos;
+            scoreBoard.upper.twos.points = calculateUpperCategory(2, lastRoll);
+            scoreBoard.upper.twos.assigned = true;
+            return scoreBoard.upper.twos.points;
             break;
         case Categories.upper.threes:
-            scoreBoard.upper.threes = calculateUpperCategory(3, lastRoll);
-            return scoreBoard.upper.threes;
+            scoreBoard.upper.threes.points = calculateUpperCategory(3, lastRoll);
+            scoreBoard.upper.threes.assigned = true;
+            return scoreBoard.upper.threes.points;
             break;
         case Categories.upper.fours:
-            scoreBoard.upper.fours = calculateUpperCategory(4, lastRoll);
-            return scoreBoard.upper.fours;
+            scoreBoard.upper.fours.points = calculateUpperCategory(4, lastRoll);
+            scoreBoard.upper.fours.assigned = true;
+            return scoreBoard.upper.fours.points;
             break;
         case Categories.upper.fives:
-            scoreBoard.upper.fives = calculateUpperCategory(5, lastRoll);
-            return scoreBoard.upper.fives;
+            scoreBoard.upper.fives.points = calculateUpperCategory(5, lastRoll);
+            scoreBoard.upper.fives.assigned = true;
+            return scoreBoard.upper.fives.points;
             break;
         case Categories.upper.sixes:
-            scoreBoard.upper.sixes = calculateUpperCategory(6, lastRoll);
-            return scoreBoard.upper.sixes;
+            scoreBoard.upper.sixes.points = calculateUpperCategory(6, lastRoll);
+            scoreBoard.upper.sixes.assigned = true;
+            return scoreBoard.upper.sixes.points;
             break;
         case Categories.lower.threeOfAKind:
-            scoreBoard.upper.threeOfAKind = calculateNumberOfAKind(3, lastRoll);
-            return scoreBoard.upper.threeOfAKind;
+            scoreBoard.lower.threeOfAKind.points = calculateNumberOfAKind(3, lastRoll);
+            scoreBoard.lower.threeOfAKind.assigned = true;
+            return scoreBoard.lower.threeOfAKind.points;
             break;
         case Categories.lower.fourOfAKind:
-            scoreBoard.upper.fourOfAKind = calculateNumberOfAKind(4, lastRoll);
-            return scoreBoard.upper.fourOfAKind;
+            scoreBoard.lower.fourOfAKind.points = calculateNumberOfAKind(4, lastRoll);
+            scoreBoard.lower.fourOfAKind.assigned = true;
+            return scoreBoard.lower.fourOfAKind.points;
             break;
-        case Categories.upper.fullHouse:
-            scoreBoard.upper.fullHouse = calculateFullHouse(lastRoll);
-            return scoreBoard.upper.fullHouse;
+        case Categories.lower.fullHouse:
+            scoreBoard.lower.fullHouse.points = calculateFullHouse(lastRoll);
+            scoreBoard.lower.fullHouse.assigned = true;
+            return scoreBoard.lower.fullHouse.points;
             break;
         case Categories.lower.smallStraight:
-            scoreBoard.upper.smallStraight = calculateSmallStraight(lastRoll);
-            return scoreBoard.upper.smallStraight;
+            scoreBoard.lower.smallStraight.points = calculateSmallStraight(lastRoll);
+            scoreBoard.lower.smallStraight.assigned = true;
+            return scoreBoard.lower.smallStraight.points;
             break;
         case Categories.lower.largeStraight:
-            scoreBoard.upper.largeStraight = calculateLargeStraight(lastRoll);
-            return scoreBoard.upper.largeStraight;
+            scoreBoard.lower.largeStraight.points = calculateLargeStraight(lastRoll);
+            scoreBoard.lower.largeStraight.assigned = true;
+            return scoreBoard.lower.largeStraight.points;
             break;
         case Categories.lower.yahtzee:
-            scoreBoard.upper.yahtzee = calculateYahtzee(lastRoll);
-            return scoreBoard.upper.yahtzee;
+            scoreBoard.lower.yahtzee.points = calculateYahtzee(lastRoll);
+            scoreBoard.lower.yahtzee.assigned = true;
+            return scoreBoard.lower.yahtzee.points;
             break;
         case Categories.lower.chance:
-            scoreBoard.upper.chance = calculateChance(lastRoll);
-            return scoreBoard.upper.chance;
+            scoreBoard.lower.chance.points = calculateChance(lastRoll);
+            scoreBoard.lower.chance.assigned = true;
+            return scoreBoard.lower.chance.points;
             break;
         default:
             break;
@@ -255,19 +266,21 @@ function calculateUpperCategory(value, lastRoll) {
 
 function findOpenCategories(categories) {
     let openCatergories = [];
-    for (const category in categories) {
-        if (!category) openCatergories.push(category);
+    for (const [key, category] of Object.entries(categories)) {
+        if (!category.assigned) {
+            openCatergories.push(key);
+        }
     }
     return openCatergories;
 }
 
 function scoreBoardFull(scoreBoard) {
-    return hasUndefinedValues(scoreBoard.upper) || hasUndefinedValues(scoreBoard.lower);
+    return !hasUnassignedValues(scoreBoard.upper) && !hasUnassignedValues(scoreBoard.lower);
 }
 
-function hasUndefinedValues(object) {
-    for (const value of Object.values(object)) {
-        if (value === undefined) {
+function hasUnassignedValues(categories) {
+    for (const category of Object.values(categories)) {
+        if (!category.assigned) {
             return true;
         }
     }
@@ -275,13 +288,11 @@ function hasUndefinedValues(object) {
 }
 
 function rollDices(prevRoll) {
-    return {
-        dice0: keepOrRollDice(prevRoll.dice0),
-        dice1: keepOrRollDice(prevRoll.dice1),
-        dice2: keepOrRollDice(prevRoll.dice2),
-        dice3: keepOrRollDice(prevRoll.dice3),
-        dice4: keepOrRollDice(prevRoll.dice4)
-    };
+    let newRoll = [];
+    for (const dice in prevRoll) {
+        newRoll.push(keepOrRollDice(dice));
+    }
+    return newRoll;
 }
 
 function keepOrRollDice(oldDice) {
@@ -307,12 +318,11 @@ function createRandomMatch(maxNumberPlayer) {
     };
     for (let i = 0; i < numberOfPlayers; ++i) {
         let turns = [{ ...InitialTurn }];
-        let turn = createRandomTurn(turns[turns.length - 1]);
+        let turn = createRandomTurn(turns[0]);
         while (turn) {
             turns.push(turn);
             turn = createRandomTurn(turns[turns.length - 1]);
         }
-        console.log(turns);
         match.players.push({
             ...InitialPlayer,
             pos: i,
@@ -327,13 +337,13 @@ function createRandomTurn(lastTurn) {
         const newTurn = {
             ...lastTurn,
             nr: lastTurn.nr + 1,
-            rolls: [],
+            rolls: [{ ...InitialRoll }],
             score: 0
         };
-        let numberOfRolls = getRandomInt(MAX_NUMBER_ROLLS);
+        let numberOfRolls = getRandomInt(MAX_NUMBER_ROLLS - 1);
         for (let i = 0; i < numberOfRolls; ++i) {
-            let prevRoll = newTurn.rolls[i - 1];
-            newTurn.rolls.push(rollDices(prevRoll));
+            let prevRoll = newTurn.rolls[i];
+            newTurn.rolls.push({ ...rollDices(prevRoll) });
         }
         assignRandomCategory(newTurn);
         return newTurn;
@@ -341,5 +351,4 @@ function createRandomTurn(lastTurn) {
         return undefined;
     }
 }
-
-console.log(createRandomMatch(1));
+console.log(JSON.stringify(createRandomMatch(1), null, 2));
