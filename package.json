@@ -4,9 +4,10 @@
   "description": "",
   "main": "src/index.js",
   "scripts": {
-    "build": "npm run format && npm run babel",
+    "build": "npm run format && npm run test && npm run babel",
     "start": "node dist/index.js",
-    "babel": "babel src --out-dir dist",
+    "test": "jest --coverage --testPathIgnorePatterns TestData.js",
+    "babel": "babel src --ignore src/__mocks__,src/__test__ --out-dir dist",
     "format": "npx prettier --write \"src/**/*.js\"",
     "run": "npm run build && npm run start"
   },
@@ -16,8 +17,12 @@
   "devDependencies": {
     "@babel/cli": "^7.5.5",
     "@babel/core": "^7.5.5",
-    "@babel/preset-env": "^7.5.5",
     "@babel/polyfill": "^7.4.4",
+    "@babel/preset-env": "^7.5.5",
+    "babel-jest": "^24.9.0",
+    "jest": "^24.9.0",
+    "jest-environment-jsdom-fourteen": "^0.1.0",
+    "jest-watch-typeahead": "^0.4.0",
     "prettier": "^1.18.2"
   },
   "dependencies": {
