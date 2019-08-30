@@ -1,4 +1,5 @@
 import {
+    calculateCategoryValue,
     calculateUpperCategory,
     calculateNumberOfAKind,
     calculateFullHouse,
@@ -12,6 +13,7 @@ import {
     countDices,
     InitialTurn,
     InitialDice,
+    Categories,
     FULL_HOUSE_VALUE,
     SMALL_STRAIGHT_VALUE,
     LARGE_STRAIGHT_VALUE,
@@ -21,9 +23,9 @@ import { Rolls } from '../TestData';
 
 it('can identify upper categories', async () => {
     const { diceCountTestRoll } = Rolls;
-    let diceCount = countDices(diceCountTestRoll)
+    let diceCount = countDices(diceCountTestRoll);
     for (let value of Object.values(diceCount)) {
-      expect(value).toBe(1);
+        expect(value).toBe(1);
     }
 });
 
@@ -165,14 +167,36 @@ it('can identify chance', async () => {
 });
 
 it('can createRandomTurn', async () => {
-  let turn1 = createRandomTurn({...InitialTurn});
-  expect(turn1.nr).toBe(1);
-  expect(turn1.rolls.length).toBeGreaterThan(1);
-  let turn2 = createRandomTurn(turn1);
-  expect(turn2.nr).toBe(2);
-  expect(turn2.rolls.length).toBeGreaterThan(1);
+    let turn1 = createRandomTurn({ ...InitialTurn });
+    expect(turn1.nr).toBe(1);
+    expect(turn1.rolls.length).toBeGreaterThan(1);
+    let turn2 = createRandomTurn(turn1);
+    expect(turn2.nr).toBe(2);
+    expect(turn2.rolls.length).toBeGreaterThan(1);
 });
 
 it('can createRandomMatch', async () => {
   console.log(JSON.stringify(createRandomMatch(1), null, 2));
+});
+
+function testCategories(categories, scoreBoard, categoryGroup, fullScore) {
+    for (let i = 0; i < categories.length; ++i) {
+        let category = categories[i];
+        let result = calculateCategoryValue(category, scoreBoard, fullScore[i].dices);
+        expect(scoreBoard[categoryGroup][category].points).toBe(result);
+        expect(scoreBoard[categoryGroup][category].assigned).toBe(true);
+        if(result !== fullScore[i].expectedResult) {
+          console.log(category)
+        }
+        expect(result).toBe(fullScore[i].expectedResult);
+    }
+}
+
+it('can calculateCategoryValue', async () => {
+    let scoreBoard = { ...InitialTurn.scoreBoard };
+    let allUpperCategories = [...Object.values(Categories.upper)];
+    let allLowerCategories = [...Object.values(Categories.lower)];
+    const { fullScore } = Rolls;
+    testCategories(allUpperCategories, scoreBoard, 'upper', fullScore.upper);
+    testCategories(allLowerCategories, scoreBoard, 'lower', fullScore.lower);
 });

@@ -7,7 +7,7 @@ export const LARGE_STRAIGHT_VALUE = 40;
 export const YAHTZEE_VALUE = 50;
 export const MAX_NUMBER_TURNS = 13;
 
-const Categories = {
+export const Categories = {
     upper: {
         aces: 'aces',
         twos: 'twos',
@@ -93,7 +93,7 @@ function assignRandomCategory(turn) {
     let categoryValue = calculateCategoryValue(category, scoreBoard, lastRoll);
 }
 
-function calculateCategoryValue(category, scoreBoard, lastRoll) {
+export function calculateCategoryValue(category, scoreBoard, lastRoll) {
     switch (category) {
         case Categories.upper.aces:
             scoreBoard.upper.aces.points = calculateUpperCategory(1, lastRoll);
@@ -169,6 +169,7 @@ export function calculateFullHouse(roll) {
     let diceCount = countDices(roll);
     let haveTwos = false;
     let haveThrees = false;
+    let haveFives = false;
     for (const [key, value] of Object.entries(diceCount)) {
         if (value === 2) {
             haveTwos = true;
@@ -176,8 +177,11 @@ export function calculateFullHouse(roll) {
         if (value === 3) {
             haveThrees = true;
         }
+        if (value === 5) {
+            haveFives = true;
+        }
     }
-    return haveTwos && haveThrees ? FULL_HOUSE_VALUE : 0;
+    return (haveTwos && haveThrees) || haveFives ? FULL_HOUSE_VALUE : 0;
 }
 
 export function calculateSmallStraight(roll) {
@@ -319,19 +323,19 @@ export function getRandomInt(max) {
 }
 
 export function createRandomTurn(lastTurn) {
-        const newTurn = {
-            ...lastTurn,
-            nr: lastTurn.nr + 1,
-            rolls: [{ ...InitialRoll }],
-            score: 0
-        };
-        let numberOfRolls = getRandomInt(MAX_NUMBER_ROLLS - 1);
-        for (let i = 0; i < numberOfRolls; ++i) {
-            let prevRoll = newTurn.rolls[i];
-            newTurn.rolls.push([ ...rollDices(prevRoll) ]);
-        }
-        assignRandomCategory(newTurn);
-        return newTurn;
+    const newTurn = {
+        ...lastTurn,
+        nr: lastTurn.nr + 1,
+        rolls: [{ ...InitialRoll }],
+        score: 0
+    };
+    let numberOfRolls = getRandomInt(MAX_NUMBER_ROLLS - 1);
+    for (let i = 0; i < numberOfRolls; ++i) {
+        let prevRoll = newTurn.rolls[i];
+        newTurn.rolls.push([...rollDices(prevRoll)]);
+    }
+    assignRandomCategory(newTurn);
+    return newTurn;
 }
 
 export function createRandomMatch(maxNumberPlayer) {
@@ -341,10 +345,9 @@ export function createRandomMatch(maxNumberPlayer) {
         id: uuid()
     };
     for (let i = 0; i < numberOfPlayers; ++i) {
-        let turns = [createRandomTurn({...InitialTurn})];
-        while(scoreBoardFree(turns[turns.length].scoreBoard)) {
-            turn = createRandomTurn(turns[turns.length - 1]);
-            turns.push(turn);
+        let turns = [createRandomTurn({ ...InitialTurn })];
+        for (let j = 0; j < MAX_NUMBER_TURNS - 1; ++j) {
+            turns.push(createRandomTurn(turns[turns.length - 1]));
         }
         match.players.push({
             ...InitialPlayer,

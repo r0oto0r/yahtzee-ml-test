@@ -257,6 +257,13 @@ export const Rolls = {
             { ...InitialDice, value: 6 },
             { ...InitialDice, value: 3 },
             { ...InitialDice, value: 6 }
+        ],
+        [
+            { ...InitialDice, value: 6 },
+            { ...InitialDice, value: 6 },
+            { ...InitialDice, value: 6 },
+            { ...InitialDice, value: 6 },
+            { ...InitialDice, value: 6 }
         ]
     ],
     invalidFullHouses: [
@@ -287,13 +294,6 @@ export const Rolls = {
             { ...InitialDice, value: 1 },
             { ...InitialDice, value: 2 },
             { ...InitialDice, value: 3 }
-        ],
-        [
-            { ...InitialDice, value: 1 },
-            { ...InitialDice, value: 1 },
-            { ...InitialDice, value: 1 },
-            { ...InitialDice, value: 1 },
-            { ...InitialDice, value: 1 }
         ]
     ],
     validSmallStraights: [
@@ -431,11 +431,147 @@ export const Rolls = {
         ]
     ],
     diceCountTestRoll: [
-            { ...InitialDice, value: 1 },
-            { ...InitialDice, value: 2 },
-            { ...InitialDice, value: 3 },
-            { ...InitialDice, value: 4 },
-            { ...InitialDice, value: 5 },
-            { ...InitialDice, value: 6 }
+        { ...InitialDice, value: 1 },
+        { ...InitialDice, value: 2 },
+        { ...InitialDice, value: 3 },
+        { ...InitialDice, value: 4 },
+        { ...InitialDice, value: 5 },
+        { ...InitialDice, value: 6 }
+    ],
+    fullScore: {
+        upper: [
+            {
+                expectedResult: 5,
+                dices: [
+                    { ...InitialDice, value: 1 },
+                    { ...InitialDice, value: 1 },
+                    { ...InitialDice, value: 1 },
+                    { ...InitialDice, value: 1 },
+                    { ...InitialDice, value: 1 }
+                ]
+            },
+            {
+                expectedResult: 10,
+                dices: [
+                    { ...InitialDice, value: 2 },
+                    { ...InitialDice, value: 2 },
+                    { ...InitialDice, value: 2 },
+                    { ...InitialDice, value: 2 },
+                    { ...InitialDice, value: 2 }
+                ]
+            },
+            {
+                expectedResult: 15,
+                dices: [
+                    { ...InitialDice, value: 3 },
+                    { ...InitialDice, value: 3 },
+                    { ...InitialDice, value: 3 },
+                    { ...InitialDice, value: 3 },
+                    { ...InitialDice, value: 3 }
+                ]
+            },
+            {
+                expectedResult: 20,
+                dices: [
+                    { ...InitialDice, value: 4 },
+                    { ...InitialDice, value: 4 },
+                    { ...InitialDice, value: 4 },
+                    { ...InitialDice, value: 4 },
+                    { ...InitialDice, value: 4 }
+                ]
+            },
+            {
+                expectedResult: 25,
+                dices: [
+                    { ...InitialDice, value: 5 },
+                    { ...InitialDice, value: 5 },
+                    { ...InitialDice, value: 5 },
+                    { ...InitialDice, value: 5 },
+                    { ...InitialDice, value: 5 }
+                ]
+            },
+            {
+                expectedResult: 30,
+                dices: [
+                    { ...InitialDice, value: 6 },
+                    { ...InitialDice, value: 6 },
+                    { ...InitialDice, value: 6 },
+                    { ...InitialDice, value: 6 },
+                    { ...InitialDice, value: 6 }
+                ]
+            }
+        ],
+        lower: [
+            {
+                expectedResult: 30,
+                dices: [
+                    { ...InitialDice, value: 6 },
+                    { ...InitialDice, value: 6 },
+                    { ...InitialDice, value: 6 },
+                    { ...InitialDice, value: 6 },
+                    { ...InitialDice, value: 6 }
+                ]
+            },
+            {
+                expectedResult: 30,
+                dices: [
+                    { ...InitialDice, value: 6 },
+                    { ...InitialDice, value: 6 },
+                    { ...InitialDice, value: 6 },
+                    { ...InitialDice, value: 6 },
+                    { ...InitialDice, value: 6 }
+                ]
+            },
+            {
+                expectedResult: 25,
+                dices: [
+                    { ...InitialDice, value: 6 },
+                    { ...InitialDice, value: 6 },
+                    { ...InitialDice, value: 6 },
+                    { ...InitialDice, value: 6 },
+                    { ...InitialDice, value: 6 }
+                ]
+            },
+            {
+                expectedResult: 30,
+                dices: [
+                    { ...InitialDice, value: 1 },
+                    { ...InitialDice, value: 2 },
+                    { ...InitialDice, value: 3 },
+                    { ...InitialDice, value: 4 },
+                    { ...InitialDice, value: 5 }
+                ]
+            },
+            {
+                expectedResult: 40,
+                dices: [
+                    { ...InitialDice, value: 2 },
+                    { ...InitialDice, value: 3 },
+                    { ...InitialDice, value: 4 },
+                    { ...InitialDice, value: 5 },
+                    { ...InitialDice, value: 6 }
+                ]
+            },
+            {
+                expectedResult: 50,
+                dices: [
+                    { ...InitialDice, value: 6 },
+                    { ...InitialDice, value: 6 },
+                    { ...InitialDice, value: 6 },
+                    { ...InitialDice, value: 6 },
+                    { ...InitialDice, value: 6 }
+                ]
+            },
+            {
+                expectedResult: 30,
+                dices: [
+                    { ...InitialDice, value: 6 },
+                    { ...InitialDice, value: 6 },
+                    { ...InitialDice, value: 6 },
+                    { ...InitialDice, value: 6 },
+                    { ...InitialDice, value: 6 }
+                ]
+            }
         ]
+    }
 };
