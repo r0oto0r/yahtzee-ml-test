@@ -9,6 +9,7 @@ import {
     calculateChance,
     createRandomMatch,
     createRandomTurn,
+    scoreBoardFree,
     getRandomInt,
     countDices,
     InitialTurn,
@@ -17,7 +18,8 @@ import {
     FULL_HOUSE_VALUE,
     SMALL_STRAIGHT_VALUE,
     LARGE_STRAIGHT_VALUE,
-    YAHTZEE_VALUE
+    YAHTZEE_VALUE,
+    MAX_NUMBER_TURNS
 } from '../../modules/yahtzee';
 import { Rolls } from '../TestData';
 
@@ -154,29 +156,43 @@ it('can identify wrong yahtzee', async () => {
 });
 
 it('can identify chance', async () => {
-    let roll = [
+    const roll = [
         { ...InitialDice, value: getRandomInt(6) },
         { ...InitialDice, value: getRandomInt(6) },
         { ...InitialDice, value: getRandomInt(6) },
         { ...InitialDice, value: getRandomInt(6) },
         { ...InitialDice, value: getRandomInt(6) }
     ];
-    let sum = roll[0].value + roll[1].value + roll[2].value + roll[3].value + roll[4].value;
-    let result = calculateChance(roll);
+    const sum = roll[0].value + roll[1].value + roll[2].value + roll[3].value + roll[4].value;
+    const result = calculateChance(roll);
     expect(result).toBe(sum);
 });
 
 it('can createRandomTurn', async () => {
-    let turn1 = createRandomTurn({ ...InitialTurn });
+    const turn1 = createRandomTurn({ ...InitialTurn });
     expect(turn1.nr).toBe(1);
     expect(turn1.rolls.length).toBeGreaterThan(1);
-    let turn2 = createRandomTurn(turn1);
+    const turn2 = createRandomTurn(turn1);
     expect(turn2.nr).toBe(2);
     expect(turn2.rolls.length).toBeGreaterThan(1);
 });
 
 it('can createRandomMatch', async () => {
-    console.log(JSON.stringify(createRandomMatch(1), null, 2));
+    const match = createRandomMatch(1);
+    expect(match).toBeDefined();
+    expect(match.players.length).toBeGreaterThan(0);
+    const player = match.players[0];
+    expect(player).toBeDefined();
+    expect(player.turns).toBeDefined();
+    const {turns} = player;
+    expect(turns.length).toBe(MAX_NUMBER_TURNS);
+    for(const turn of turns) {
+      expect(turn.rolls.length).toBeGreaterThan(0);
+    }
+    const lastTurn = turns[turns.length - 1];
+    expect(lastTurn).toBeDefined();
+    const { scoreBoard } = lastTurn;
+    expect(scoreBoardFree(scoreBoard)).toBe(false);
 });
 
 function testCategories(categories, scoreBoard, categoryGroup, fullScore) {

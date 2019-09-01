@@ -97,7 +97,7 @@ function findOpenCategories(categories) {
     return openCatergories;
 }
 
-function scoreBoardFree(scoreBoard) {
+export function scoreBoardFree(scoreBoard) {
     return hasUnassignedValues(scoreBoard.upper) || hasUnassignedValues(scoreBoard.lower);
 }
 
@@ -135,7 +135,7 @@ function assignRandomCategory(turn) {
     openCatergories = openCatergories.concat(findOpenCategories(scoreBoard.upper));
     openCatergories = openCatergories.concat(findOpenCategories(scoreBoard.lower));
     if(openCatergories.length > 0) {
-    let category = openCatergories[getRandomInt(openCatergories.length - 1) - 1];
+    let category = openCatergories[getRandomInt(openCatergories.length) - 1];
     let lastRoll = rolls[rolls.length - 1];
     calculateCategoryValue(category, scoreBoard, lastRoll);
   }
@@ -195,8 +195,6 @@ export function calculateCategoryValue(category, scoreBoard, lastRoll) {
         case Categories.lower.chance:
             categoryGroup = 'lower';
             points = calculateChance(lastRoll);
-            break;
-        default:
             break;
     }
     setCategoryPoints(scoreBoard, categoryGroup, category, points);
@@ -321,7 +319,7 @@ export function createRandomTurn(lastTurn) {
         rolls: [{ ...InitialRoll }],
         score: 0
     };
-    let numberOfRolls = getRandomInt(MAX_NUMBER_ROLLS - 1) - 1;
+    let numberOfRolls = getRandomInt(MAX_NUMBER_ROLLS);
     for (let i = 0; i < numberOfRolls; ++i) {
         let prevRoll = newTurn.rolls[i];
         newTurn.rolls.push([...rollDices(prevRoll)]);
@@ -331,14 +329,15 @@ export function createRandomTurn(lastTurn) {
 }
 
 export function createRandomMatch(maxNumberPlayer) {
-    const numberOfPlayers = getRandomInt(maxNumberPlayer - 1) - 1;
+    const numberOfPlayers = getRandomInt(maxNumberPlayer);
     const match = {
         ...InitialMatch,
+        players:[],
         id: uuid()
     };
     for (let i = 0; i < numberOfPlayers; ++i) {
         let turns = [createRandomTurn({ ...InitialTurn })];
-        for (let j = 0; j < MAX_NUMBER_TURNS; ++j) {
+        for (let j = 0; j < MAX_NUMBER_TURNS - 1; ++j) {
             turns.push(createRandomTurn(turns[turns.length - 1]));
         }
         match.players.push({

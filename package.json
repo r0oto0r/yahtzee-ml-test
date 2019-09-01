@@ -1,7 +1,8 @@
 {
   "name": "test",
   "version": "1.0.0",
-  "description": "",
+  "keywords": [],
+  "license": "ISC",
   "main": "src/index.js",
   "scripts": {
     "build": "npm run format && npm run test && npm run babel",
@@ -11,9 +12,9 @@
     "format": "npx prettier --write \"src/**/*.js\"",
     "run": "npm run build && npm run start"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "dependencies": {
+    "uuid": "^3.3.3"
+  },
   "devDependencies": {
     "@babel/cli": "^7.5.5",
     "@babel/core": "^7.5.5",
@@ -24,8 +25,5 @@
     "jest-environment-jsdom-fourteen": "^0.1.0",
     "jest-watch-typeahead": "^0.4.0",
     "prettier": "^1.18.2"
-  },
-  "dependencies": {
-    "uuid": "^3.3.3"
   }
 }
