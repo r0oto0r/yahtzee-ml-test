@@ -83,86 +83,124 @@ const InitialMatch = {
     finished: true
 };
 
+export function getRandomInt(max) {
+    return Math.floor(Math.random() * max) + 1;
+}
+
+function findOpenCategories(categories) {
+    let openCatergories = [];
+    for (const [key, category] of Object.entries(categories)) {
+        if (!category.assigned) {
+            openCatergories.push(key);
+        }
+    }
+    return openCatergories;
+}
+
+function scoreBoardFree(scoreBoard) {
+    return hasUnassignedValues(scoreBoard.upper) || hasUnassignedValues(scoreBoard.lower);
+}
+
+function hasUnassignedValues(categories) {
+    for (const category of Object.values(categories)) {
+        if (!category.assigned) {
+            return true;
+        }
+    }
+    return false;
+}
+
+function rollDices(prevRoll) {
+    let newRoll = [];
+    for (const dice in prevRoll) {
+        newRoll.push(keepOrRollDice(dice));
+    }
+    return newRoll;
+}
+
+function keepOrRollDice(oldDice) {
+    return oldDice.keep ? { ...rollDice(), value: oldDice.value } : rollDice();
+}
+
+function rollDice() {
+    return {
+        value: getRandomInt(6),
+        keep: getRandomInt(2) === 1 ? true : false
+    };
+}
+
 function assignRandomCategory(turn) {
     const { scoreBoard, rolls } = turn;
     let openCatergories = [];
     openCatergories = openCatergories.concat(findOpenCategories(scoreBoard.upper));
     openCatergories = openCatergories.concat(findOpenCategories(scoreBoard.lower));
-    let category = openCatergories[getRandomInt(openCatergories.length) - 2];
+    if(openCatergories.length > 0) {
+    let category = openCatergories[getRandomInt(openCatergories.length - 1) - 1];
     let lastRoll = rolls[rolls.length - 1];
-    let categoryValue = calculateCategoryValue(category, scoreBoard, lastRoll);
+    calculateCategoryValue(category, scoreBoard, lastRoll);
+  }
+}
+
+function setCategoryPoints(scoreBoard, categoryGroup, category, points) {
+    scoreBoard[categoryGroup][category].points = points;
+    scoreBoard[categoryGroup][category].assigned = true;
 }
 
 export function calculateCategoryValue(category, scoreBoard, lastRoll) {
+    let points;
+    let categoryGroup = 'upper';
     switch (category) {
         case Categories.upper.aces:
-            scoreBoard.upper.aces.points = calculateUpperCategory(1, lastRoll);
-            scoreBoard.upper.aces.assigned = true;
-            return scoreBoard.upper.aces.points;
+            points = calculateUpperCategory(1, lastRoll);
             break;
         case Categories.upper.twos:
-            scoreBoard.upper.twos.points = calculateUpperCategory(2, lastRoll);
-            scoreBoard.upper.twos.assigned = true;
-            return scoreBoard.upper.twos.points;
+            points = calculateUpperCategory(2, lastRoll);
             break;
         case Categories.upper.threes:
-            scoreBoard.upper.threes.points = calculateUpperCategory(3, lastRoll);
-            scoreBoard.upper.threes.assigned = true;
-            return scoreBoard.upper.threes.points;
+            points = calculateUpperCategory(3, lastRoll);
             break;
         case Categories.upper.fours:
-            scoreBoard.upper.fours.points = calculateUpperCategory(4, lastRoll);
-            scoreBoard.upper.fours.assigned = true;
-            return scoreBoard.upper.fours.points;
+            points = calculateUpperCategory(4, lastRoll);
             break;
         case Categories.upper.fives:
-            scoreBoard.upper.fives.points = calculateUpperCategory(5, lastRoll);
-            scoreBoard.upper.fives.assigned = true;
-            return scoreBoard.upper.fives.points;
+            points = calculateUpperCategory(5, lastRoll);
             break;
         case Categories.upper.sixes:
-            scoreBoard.upper.sixes.points = calculateUpperCategory(6, lastRoll);
-            scoreBoard.upper.sixes.assigned = true;
-            return scoreBoard.upper.sixes.points;
+            points = calculateUpperCategory(6, lastRoll);
             break;
         case Categories.lower.threeOfAKind:
-            scoreBoard.lower.threeOfAKind.points = calculateNumberOfAKind(3, lastRoll);
-            scoreBoard.lower.threeOfAKind.assigned = true;
-            return scoreBoard.lower.threeOfAKind.points;
+            categoryGroup = 'lower';
+            points = calculateNumberOfAKind(3, lastRoll);
             break;
         case Categories.lower.fourOfAKind:
-            scoreBoard.lower.fourOfAKind.points = calculateNumberOfAKind(4, lastRoll);
-            scoreBoard.lower.fourOfAKind.assigned = true;
-            return scoreBoard.lower.fourOfAKind.points;
+            categoryGroup = 'lower';
+            points = calculateNumberOfAKind(4, lastRoll);
             break;
         case Categories.lower.fullHouse:
-            scoreBoard.lower.fullHouse.points = calculateFullHouse(lastRoll);
-            scoreBoard.lower.fullHouse.assigned = true;
-            return scoreBoard.lower.fullHouse.points;
+            categoryGroup = 'lower';
+            points = calculateFullHouse(lastRoll);
             break;
         case Categories.lower.smallStraight:
-            scoreBoard.lower.smallStraight.points = calculateSmallStraight(lastRoll);
-            scoreBoard.lower.smallStraight.assigned = true;
-            return scoreBoard.lower.smallStraight.points;
+            categoryGroup = 'lower';
+            points = calculateSmallStraight(lastRoll);
             break;
         case Categories.lower.largeStraight:
-            scoreBoard.lower.largeStraight.points = calculateLargeStraight(lastRoll);
-            scoreBoard.lower.largeStraight.assigned = true;
-            return scoreBoard.lower.largeStraight.points;
+            categoryGroup = 'lower';
+            points = calculateLargeStraight(lastRoll);
             break;
         case Categories.lower.yahtzee:
-            scoreBoard.lower.yahtzee.points = calculateYahtzee(lastRoll);
-            scoreBoard.lower.yahtzee.assigned = true;
-            return scoreBoard.lower.yahtzee.points;
+            categoryGroup = 'lower';
+            points = calculateYahtzee(lastRoll);
             break;
         case Categories.lower.chance:
-            scoreBoard.lower.chance.points = calculateChance(lastRoll);
-            scoreBoard.lower.chance.assigned = true;
-            return scoreBoard.lower.chance.points;
+            categoryGroup = 'lower';
+            points = calculateChance(lastRoll);
             break;
         default:
             break;
     }
+    setCategoryPoints(scoreBoard, categoryGroup, category, points);
+    return points;
 }
 
 export function calculateFullHouse(roll) {
@@ -276,52 +314,6 @@ export function calculateUpperCategory(value, roll) {
     return sum;
 }
 
-function findOpenCategories(categories) {
-    let openCatergories = [];
-    for (const [key, category] of Object.entries(categories)) {
-        if (!category.assigned) {
-            openCatergories.push(key);
-        }
-    }
-    return openCatergories;
-}
-
-function scoreBoardFree(scoreBoard) {
-    return hasUnassignedValues(scoreBoard.upper) || hasUnassignedValues(scoreBoard.lower);
-}
-
-function hasUnassignedValues(categories) {
-    for (const category of Object.values(categories)) {
-        if (!category.assigned) {
-            return true;
-        }
-    }
-    return false;
-}
-
-function rollDices(prevRoll) {
-    let newRoll = [];
-    for (const dice in prevRoll) {
-        newRoll.push(keepOrRollDice(dice));
-    }
-    return newRoll;
-}
-
-function keepOrRollDice(oldDice) {
-    return oldDice.keep ? { ...rollDice(), value: oldDice.value } : rollDice();
-}
-
-function rollDice() {
-    return {
-        value: getRandomInt(6),
-        keep: getRandomInt(2) === 1 ? true : false
-    };
-}
-
-export function getRandomInt(max) {
-    return Math.floor(Math.random() * Math.floor(max)) + 1;
-}
-
 export function createRandomTurn(lastTurn) {
     const newTurn = {
         ...lastTurn,
@@ -329,7 +321,7 @@ export function createRandomTurn(lastTurn) {
         rolls: [{ ...InitialRoll }],
         score: 0
     };
-    let numberOfRolls = getRandomInt(MAX_NUMBER_ROLLS - 1);
+    let numberOfRolls = getRandomInt(MAX_NUMBER_ROLLS - 1) - 1;
     for (let i = 0; i < numberOfRolls; ++i) {
         let prevRoll = newTurn.rolls[i];
         newTurn.rolls.push([...rollDices(prevRoll)]);
@@ -339,14 +331,14 @@ export function createRandomTurn(lastTurn) {
 }
 
 export function createRandomMatch(maxNumberPlayer) {
-    const numberOfPlayers = getRandomInt(maxNumberPlayer - 1);
+    const numberOfPlayers = getRandomInt(maxNumberPlayer - 1) - 1;
     const match = {
         ...InitialMatch,
         id: uuid()
     };
     for (let i = 0; i < numberOfPlayers; ++i) {
         let turns = [createRandomTurn({ ...InitialTurn })];
-        for (let j = 0; j < MAX_NUMBER_TURNS - 1; ++j) {
+        for (let j = 0; j < MAX_NUMBER_TURNS; ++j) {
             turns.push(createRandomTurn(turns[turns.length - 1]));
         }
         match.players.push({

@@ -176,7 +176,7 @@ it('can createRandomTurn', async () => {
 });
 
 it('can createRandomMatch', async () => {
-  console.log(JSON.stringify(createRandomMatch(1), null, 2));
+    console.log(JSON.stringify(createRandomMatch(1), null, 2));
 });
 
 function testCategories(categories, scoreBoard, categoryGroup, fullScore) {
@@ -185,8 +185,8 @@ function testCategories(categories, scoreBoard, categoryGroup, fullScore) {
         let result = calculateCategoryValue(category, scoreBoard, fullScore[i].dices);
         expect(scoreBoard[categoryGroup][category].points).toBe(result);
         expect(scoreBoard[categoryGroup][category].assigned).toBe(true);
-        if(result !== fullScore[i].expectedResult) {
-          console.log(category)
+        if (result !== fullScore[i].expectedResult) {
+            console.log(category);
         }
         expect(result).toBe(fullScore[i].expectedResult);
     }
