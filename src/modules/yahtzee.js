@@ -5,6 +5,8 @@ export const FULL_HOUSE_VALUE = 25;
 export const SMALL_STRAIGHT_VALUE = 30;
 export const LARGE_STRAIGHT_VALUE = 40;
 export const YAHTZEE_VALUE = 50;
+export const BONUS_VALUE = 65;
+export const BONUS_THRESHOLD = 65;
 export const MAX_NUMBER_TURNS = 13;
 
 export const Categories = {
@@ -24,8 +26,7 @@ export const Categories = {
         largeStraight: 'largeStraight',
         yahtzee: 'yahtzee',
         chance: 'chance'
-    },
-    bonus: 'bonus'
+    }
 };
 
 export const InitialDice = {
@@ -46,30 +47,34 @@ const InitialCategory = {
     assigned: false
 };
 
+const InitialScoreBoard = {
+    upper: {
+        aces: { ...InitialCategory },
+        twos: { ...InitialCategory },
+        threes: { ...InitialCategory },
+        fours: { ...InitialCategory },
+        fives: { ...InitialCategory },
+        sixes: { ...InitialCategory }
+    },
+    lower: {
+        threeOfAKind: { ...InitialCategory },
+        fourOfAKind: { ...InitialCategory },
+        fullHouse: { ...InitialCategory },
+        smallStraight: { ...InitialCategory },
+        largeStraight: { ...InitialCategory },
+        yahtzee: { ...InitialCategory },
+        chance: { ...InitialCategory }
+    },
+    upperScore: 0,
+    lowerScore: 0,
+    bonus: 0,
+    totalScore: 0
+};
+
 export const InitialTurn = {
     nr: 0,
-    scoreBoard: {
-        upper: {
-            aces: { ...InitialCategory },
-            twos: { ...InitialCategory },
-            threes: { ...InitialCategory },
-            fours: { ...InitialCategory },
-            fives: { ...InitialCategory },
-            sixes: { ...InitialCategory }
-        },
-        lower: {
-            threeOfAKind: { ...InitialCategory },
-            fourOfAKind: { ...InitialCategory },
-            fullHouse: { ...InitialCategory },
-            smallStraight: { ...InitialCategory },
-            largeStraight: { ...InitialCategory },
-            yahtzee: { ...InitialCategory },
-            chance: { ...InitialCategory }
-        },
-        bonus: { ...InitialCategory }
-    },
-    rolls: [[...InitialRoll]],
-    score: 0
+    scoreBoard: { ...InitialScoreBoard },
+    rolls: [[...InitialRoll]]
 };
 
 const InitialPlayer = {
@@ -88,13 +93,13 @@ export function getRandomInt(max) {
 }
 
 function findOpenCategories(categories) {
-    let openCatergories = [];
+    let openCategories = [];
     for (const [key, category] of Object.entries(categories)) {
         if (!category.assigned) {
-            openCatergories.push(key);
+            openCategories.push(key);
         }
     }
-    return openCatergories;
+    return openCategories;
 }
 
 export function scoreBoardFree(scoreBoard) {
@@ -125,20 +130,20 @@ function keepOrRollDice(oldDice) {
 function rollDice() {
     return {
         value: getRandomInt(6),
-        keep: getRandomInt(2) === 1 ? true : false
+        keep: getRandomInt(2) === 1
     };
 }
 
 function assignRandomCategory(turn) {
     const { scoreBoard, rolls } = turn;
-    let openCatergories = [];
-    openCatergories = openCatergories.concat(findOpenCategories(scoreBoard.upper));
-    openCatergories = openCatergories.concat(findOpenCategories(scoreBoard.lower));
-    if(openCatergories.length > 0) {
-    let category = openCatergories[getRandomInt(openCatergories.length) - 1];
-    let lastRoll = rolls[rolls.length - 1];
-    calculateCategoryValue(category, scoreBoard, lastRoll);
-  }
+    let openCategories = [];
+    openCategories = openCategories.concat(findOpenCategories(scoreBoard.upper));
+    openCategories = openCategories.concat(findOpenCategories(scoreBoard.lower));
+    if (openCategories.length > 0) {
+        let category = openCategories[getRandomInt(openCategories.length) - 1];
+        let lastRoll = rolls[rolls.length - 1];
+        calculateCategoryValue(category, scoreBoard, lastRoll);
+    }
 }
 
 function setCategoryPoints(scoreBoard, categoryGroup, category, points) {
@@ -332,7 +337,7 @@ export function createRandomMatch(maxNumberPlayer) {
     const numberOfPlayers = getRandomInt(maxNumberPlayer);
     const match = {
         ...InitialMatch,
-        players:[],
+        players: [],
         id: uuid()
     };
     for (let i = 0; i < numberOfPlayers; ++i) {
@@ -347,4 +352,23 @@ export function createRandomMatch(maxNumberPlayer) {
         });
     }
     return match;
+}
+
+export function calculateScore(scoreBoard) {
+    scoreBoard.upperScore = sumUpCategories(scoreBoard.upper);
+    scoreBoard.lowerScore = sumUpCategories(scoreBoard.lower);
+    scoreBoard.bonus = scoreBoard.upperScore >= BONUS_THRESHOLD ? BONUS_VALUE : 0;
+    const { upperScore, lowerScore, bonus } = scoreBoard;
+    scoreBoard.totalScore = upperScore + lowerScore + bonus;
+    return scoreBoard.totalScore;
+}
+
+export function sumUpCategories(categories) {
+    let sum = 0;
+    for (const category of Object.values(categories)) {
+        if (category.assigned) {
+            sum += category.points;
+        }
+    }
+    return sum;
 }

@@ -572,6 +572,10 @@ export const Rolls = {
                     { ...InitialDice, value: 6 }
                 ]
             }
-        ]
+        ],
+        expectedUpperTotalScore: 105,
+        expectedBonus: 65,
+        expectedLowerTotalScore: 235,
+        expectedTotalScore: 105 + 65 + 235
     }
 };
