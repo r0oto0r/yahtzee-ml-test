@@ -13,6 +13,7 @@ import {
     getRandomInt,
     countDices,
     calculateScore,
+    InitialScoreBoard,
     InitialTurn,
     InitialDice,
     Categories,
@@ -33,7 +34,7 @@ it('can identify upper categories', async () => {
 });
 
 it('can identify free slots in scoreBoard', async () => {
-    let scoreBoard = { ...InitialTurn.scoreBoard };
+    const scoreBoard = { ...InitialScoreBoard };
     expect(scoreBoardFree(scoreBoard)).toBe(true);
 });
 
@@ -212,7 +213,7 @@ function testCategories(categories, scoreBoard, categoryGroup, fullScore) {
 }
 
 it('can calculateCategoryValue', async () => {
-    const scoreBoard = { ...InitialTurn.scoreBoard };
+    const scoreBoard = { ...InitialScoreBoard };
     const allUpperCategories = [...Object.values(Categories.upper)];
     const allLowerCategories = [...Object.values(Categories.lower)];
     const { fullScore } = Rolls;
@@ -221,13 +222,13 @@ it('can calculateCategoryValue', async () => {
 });
 
 it('can calculate empty score', async () => {
-    const scoreBoard = { ...InitialTurn.scoreBoard };
+    const scoreBoard = { ...InitialScoreBoard };
     const emptyScoreBoardScore = calculateScore(scoreBoard);
     expect(emptyScoreBoardScore).toBe(0);
 });
 
 it('can calculate full score', async () => {
-    const scoreBoard = { ...InitialTurn.scoreBoard };
+    const scoreBoard = { ...InitialScoreBoard };
     const fullScoreBoardScore = calculateScore(scoreBoard);
     const { fullScore } = Rolls;
     expect(fullScoreBoardScore).toBe(fullScore.expectedTotalScore);

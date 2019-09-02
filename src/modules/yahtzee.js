@@ -5,8 +5,6 @@ export const FULL_HOUSE_VALUE = 25;
 export const SMALL_STRAIGHT_VALUE = 30;
 export const LARGE_STRAIGHT_VALUE = 40;
 export const YAHTZEE_VALUE = 50;
-export const BONUS_VALUE = 65;
-export const BONUS_THRESHOLD = 65;
 export const MAX_NUMBER_TURNS = 13;
 
 export const Categories = {
@@ -47,7 +45,7 @@ const InitialCategory = {
     assigned: false
 };
 
-const InitialScoreBoard = {
+export const InitialScoreBoard = {
     upper: {
         aces: { ...InitialCategory },
         twos: { ...InitialCategory },
@@ -90,48 +88,6 @@ const InitialMatch = {
 
 export function getRandomInt(max) {
     return Math.floor(Math.random() * max) + 1;
-}
-
-function findOpenCategories(categories) {
-    let openCategories = [];
-    for (const [key, category] of Object.entries(categories)) {
-        if (!category.assigned) {
-            openCategories.push(key);
-        }
-    }
-    return openCategories;
-}
-
-export function scoreBoardFree(scoreBoard) {
-    return hasUnassignedValues(scoreBoard.upper) || hasUnassignedValues(scoreBoard.lower);
-}
-
-function hasUnassignedValues(categories) {
-    for (const category of Object.values(categories)) {
-        if (!category.assigned) {
-            return true;
-        }
-    }
-    return false;
-}
-
-function rollDices(prevRoll) {
-    let newRoll = [];
-    for (const dice in prevRoll) {
-        newRoll.push(keepOrRollDice(dice));
-    }
-    return newRoll;
-}
-
-function keepOrRollDice(oldDice) {
-    return oldDice.keep ? { ...rollDice(), value: oldDice.value } : rollDice();
-}
-
-function rollDice() {
-    return {
-        value: getRandomInt(6),
-        keep: getRandomInt(2) === 1
-    };
 }
 
 function assignRandomCategory(turn) {
@@ -352,23 +308,4 @@ export function createRandomMatch(maxNumberPlayer) {
         });
     }
     return match;
-}
-
-export function calculateScore(scoreBoard) {
-    scoreBoard.upperScore = sumUpCategories(scoreBoard.upper);
-    scoreBoard.lowerScore = sumUpCategories(scoreBoard.lower);
-    scoreBoard.bonus = scoreBoard.upperScore >= BONUS_THRESHOLD ? BONUS_VALUE : 0;
-    const { upperScore, lowerScore, bonus } = scoreBoard;
-    scoreBoard.totalScore = upperScore + lowerScore + bonus;
-    return scoreBoard.totalScore;
-}
-
-export function sumUpCategories(categories) {
-    let sum = 0;
-    for (const category of Object.values(categories)) {
-        if (category.assigned) {
-            sum += category.points;
-        }
-    }
-    return sum;
 }
